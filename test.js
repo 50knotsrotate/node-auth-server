@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('./index.js');
@@ -7,7 +7,7 @@ const should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('Signup', () => {
+describe('-SIGNUP-', () => {
   it('Should give an error if username is missing', (done) => {
     chai
       .request(server)
@@ -47,7 +47,7 @@ describe('Signup', () => {
       });
   });
 
-  it('should not empty password', (done) => {
+  it('Should not empty password', (done) => {
     chai
       .request(server)
       .post('/auth/signup')
@@ -87,6 +87,60 @@ describe('Signup', () => {
         password: 'password',
       }).end((err, res) => {
         res.error.text.should.eq('Username is taken');
+        done();
+      });
+  });
+});
+
+describe('-SIGNIN-', () => {
+
+    it('Should give an error if username field is not present', (done) => { 
+        chai.request(server)
+            .post('/auth/signin')
+            .send({
+                password: 'password'
+            }).end((err, res) => { 
+                res.error.text.should.be.eq('Username is required');
+                done();
+            })
+    })
+
+    it('Should give an error if password field is not present', (done) => { 
+        chai
+          .request(server)
+          .post("/auth/signin")
+          .send({
+            username: "patrick123"
+          })
+          .end((err, res) => {
+            res.error.text.should.be.eq("Password is required");
+            done();
+          });
+    })
+
+  it('Should give an error if username does not exist', (done) => {
+    chai
+      .request(server)
+      .post('/auth/signin')
+      .send({
+        username: 'NonexistantUsername123',
+        password: 'SecretPassword123',
+      })
+      .end((err, res) => {
+        res.error.text.should.be.eq('That username does not exist');
+        done();
+      });
+  });
+
+  it('Should give an error if password is incorrect', (done) => {
+    chai.request(server)
+      .post('/auth/signin')
+      .send({
+        username: 'patrick123',
+        password: 'WrongPassword',
+      })
+      .end((err, res) => {
+        res.error.text.should.be.eq('Password is incorrect');
         done();
       });
   });
