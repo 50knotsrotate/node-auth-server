@@ -2,6 +2,14 @@ require('dotenv').config();
 
 const { CONNECTION_STRING, PORT } = process.env;
 
+const express = require('express');
+
+const bcrypt = require('bcrypt');
+
+const app = express();
+
+app.use(express.json());
+
 const { Client } = require('pg');
 
 const client = new Client({
@@ -9,9 +17,9 @@ const client = new Client({
 });
 
 client.connect((err) => {
-  if (!err) {
+  if (err) {
     // eslint-disable-next-line no-console
-    console.log('Connected to db');
+    console.log('Error trying to connect to database');
   }
 });
 
@@ -26,11 +34,6 @@ client.query(
   },
 );
 
-const express = require('express');
-
-const app = express();
-app.use(express.json());
-const bcrypt = require('bcrypt');
 
 app.post(
   '/auth/signup',
@@ -73,9 +76,8 @@ app.post(
   },
 );
 
+app.get('/auth/signin', (req, res, next) => { }, (req, res, next) => { }, (req, res, next) => { });
+
 module.exports = app;
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server started on port ${PORT}`);
-});
+app.listen(PORT);
