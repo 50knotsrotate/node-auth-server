@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "dev": "nodemon index.js"
   },
   "author": "",
@@ -12,8 +12,11 @@
   "dependencies": {
     "axios": "^0.19.0",
     "bcrypt": "^3.0.6",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
     "pg": "^7.12.1"
   },
