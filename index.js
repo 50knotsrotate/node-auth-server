@@ -9,33 +9,27 @@ const client = new Client({
 });
 
 client.connect((err) => {
-  if (err) {
-    console.log('Connection error');
-  } else {
+  if (!err) {
+    // eslint-disable-next-line no-console
     console.log('Connected to db');
   }
 });
 
-client.query('DROP TABLE IF EXISTS TEST_USERS', (err, res) => {
+client.query('DROP TABLE IF EXISTS TEST_USERS', (err) => {
   if (err) throw err;
-  console.log('TABLE DROPPED');
 });
 
 client.query(
-  'CREATE TABLE TEST_USERS(ID SERIAL PRIMARY KEY, username VARCHAR(15) not null, password VARCHAR(30) not null)',
+  'CREATE TABLE TEST_USERS(ID SERIAL PRIMARY KEY, username VARCHAR(15) not null, password VARCHAR(90) not null)',
   (err) => {
     if (err) throw err;
-    console.log('TEST_USERS created');
   },
 );
 
 const express = require('express');
 
-const users = [];
-
 const app = express();
 app.use(express.json());
-
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 
@@ -56,8 +50,7 @@ app.post(
   (req, res, next) => {
   /* Here we will check if the username was already taken */
     const { username } = req.body;
-      client.query('SELECT * FROM TEST_USERS WHERE USERNAME=$1', [username], (err, response) => {
-          console.log(response);
+    client.query('SELECT * FROM TEST_USERS WHERE USERNAME=$1', [username], (err, response) => {
       if (response.rows.length > 0) {
         res.status(500).send('Username is taken');
       } else {
@@ -68,13 +61,15 @@ app.post(
   (request, response) => {
     const { username, password } = request.body;
     const query = 'INSERT INTO TEST_USERS(username, password) VALUES($1, $2) RETURNING *';
-    const values = [username, password];
-    client.query(query, values, (err, res) => {
-      if (err) {
-        response.status(200).send(err);
-      } else {
-        response.status(200).send(res.rows);
-      }
+    bcrypt.hash(password, 2, (err, hash) => {
+      const values = [username, hash];
+      client.query(query, values, (error, res) => {
+        if (error) {
+          response.status(200).send('error');
+        } else {
+          response.status(200).send(res.rows[0]);
+        }
+      });
     });
   },
 );
@@ -82,5 +77,6 @@ app.post(
 module.exports = app;
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server started on port ${PORT}`);
 });
