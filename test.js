@@ -1,3 +1,4 @@
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('./index.js');
@@ -60,31 +61,33 @@ describe('Signup', () => {
         done();
       });
   });
+
+  it('Should return newly created user after it is inserted into DB', (done) => {
+    chai
+      .request(server)
+      .post('/auth/signup')
+      .send({
+        username: 'patrick123',
+        password: 'password',
+      }).end((err, res) => {
+        res.body.should.be.a('object');
+        res.body.username.should.be.eq('patrick123');
+        /* Line below makes sure the password is hashed */
+        res.body.password.should.not.eq('password');
+        done();
+      });
+  });
+
+  it('Should not let you create an account with a username that already exists', (done) => {
+    chai
+      .request(server)
+      .post('/auth/signup')
+      .send({
+        username: 'patrick123',
+        password: 'password',
+      }).end((err, res) => {
+        res.error.text.should.eq('Username is taken');
+        done();
+      });
+  });
 });
-
-
-// describe('Database', () => {
-//   it('should not let you push to Db without username present', (done) => {
-//     chai
-//       .request(server)
-//       .post('/auth/signup')
-//       .send({ password: '12345' })
-//       .end((err, res) => {
-//         res.body.detail.should.be.eq('Failing row contains (1, null, 12345).');
-//         done();
-//       });
-//   });
-
-//   it('Should not let you push to DB without a password', (done) => {
-//     chai
-//       .request(server)
-//       .post('/auth/signup')
-//       .send({ username: 'Username123' })
-//       .end((err, res) => {
-//         // eslint-disable-next-line dot-notation
-//         res.body['detail'].should.be.eq(
-//           'Failing row contains (2, Username123, null).',
-//         );
-//         done();
-//       });
-//   });
