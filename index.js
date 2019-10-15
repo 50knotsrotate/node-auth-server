@@ -31,7 +31,6 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const bcrypt = require('bcrypt');
-const axios = require('axios');
 
 app.post(
   '/auth/signup',
