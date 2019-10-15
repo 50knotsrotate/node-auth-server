@@ -76,7 +76,38 @@ app.post(
   },
 );
 
-app.get('/auth/signin', (req, res, next) => { }, (req, res, next) => { }, (req, res, next) => { });
+app.post('/auth/signin', (req, res, next) => {
+/* Make sure the user actually submitted both username and password
+Should I just check for this on the front end before its sent to the server? */
+  const { username, password } = req.body;
+  if (!username) {
+    res.status(500).send('Username is required');
+  } else if (!password) {
+    res.status(500).send('Password is required');
+  } else {
+    next();
+  }
+}, (req, res, next) => {
+  /* Check to see if username exists */
+  const { username } = req.body;
+
+  const query = 'SELECT * FROM TEST_USERS WHERE USERNAME=$1';
+
+  const values = [username];
+  client.query(query, values, (_err, response) => response.rows.length ? next() : res.status(500).send('That username does not exist'));
+}, (req, res) => {
+  /* Here we will check if the username matches the password */
+  const { username, password } = req.body;
+
+  const query = 'SELECT * FROM TEST_USERS WHERE USERNAME=$1';
+
+  const values = [username];
+
+  client.query(query, values, (err, _response) => {
+    const hashed = _response.rows[0].password;
+    bcrypt.compare(password, hashed, (_err, bool) => (bool ? res.status(200).send(_response.rows[0]) : res.status(500).send('Password is incorrect')));
+  });
+});
 
 module.exports = app;
 
