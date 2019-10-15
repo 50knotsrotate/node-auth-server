@@ -94,7 +94,8 @@ Should I just check for this on the front end before its sent to the server? */
   const query = 'SELECT * FROM TEST_USERS WHERE USERNAME=$1';
 
   const values = [username];
-  client.query(query, values, (_err, response) => response.rows.length ? next() : res.status(500).send('That username does not exist'));
+
+  client.query(query, values, (_err, response) => (response.rows.length ? next() : res.status(500).send('That username does not exist')));
 }, (req, res) => {
   /* Here we will check if the username matches the password */
   const { username, password } = req.body;
@@ -105,6 +106,7 @@ Should I just check for this on the front end before its sent to the server? */
 
   client.query(query, values, (err, _response) => {
     const hashed = _response.rows[0].password;
+
     bcrypt.compare(password, hashed, (_err, bool) => (bool ? res.status(200).send(_response.rows[0]) : res.status(500).send('Password is incorrect')));
   });
 });
