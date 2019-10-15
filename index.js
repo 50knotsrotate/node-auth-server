@@ -81,9 +81,9 @@ app.post('/auth/signin', (req, res, next) => {
 Should I just check for this on the front end before its sent to the server? */
   const { username, password } = req.body;
   if (!username) {
-    res.status(500).send('Username is required');
+    res.status(200).send('Username is required');
   } else if (!password) {
-    res.status(500).send('Password is required');
+    res.status(200).send('Password is required');
   } else {
     next();
   }
@@ -95,7 +95,7 @@ Should I just check for this on the front end before its sent to the server? */
 
   const values = [username];
 
-  client.query(query, values, (_err, response) => (response.rows.length ? next() : res.status(500).send('That username does not exist')));
+  client.query(query, values, (_err, response) => (response.rows.length ? next() : res.status(200).send('That username does not exist')));
 }, (req, res) => {
   /* Here we will check if the username matches the password */
   const { username, password } = req.body;
