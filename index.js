@@ -1,13 +1,13 @@
-require("dotenv").config();
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 
 const users = [];
 
 const app = express();
 app.use(express.json());
 
-const bcrypt = require("bcrypt");
-const axios = require("axios");
+const bcrypt = require('bcrypt');
+const axios = require('axios');
 
 const { CONNECTION_STRING, PORT } = process.env;
 app.post('/auth/signup', (request, response) => {
